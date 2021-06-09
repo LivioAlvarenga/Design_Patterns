@@ -1,15 +1,16 @@
 from orcamento import Orcamento
+from impostos import calcula_ICMS, calcula_ISS
 
 
 class Calculador_de_impostos(object):
 
-    def realiza_calculo(self, orçamento: Orcamento, imposto) -> None:
+    def realiza_calculo(self, orçamento: Orcamento, imposto: str) -> None:
 
         if imposto == 'ICMS':
-            imposto_calculado = orçamento.valor * 0.1
+            imposto_calculado = calcula_ICMS(orçamento)
 
         elif imposto == 'ISS':
-            imposto_calculado = orçamento.valor * 0.06
+            imposto_calculado = calcula_ISS(orçamento)
 
         print(imposto_calculado)
 
