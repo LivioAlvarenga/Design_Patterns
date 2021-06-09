@@ -1,4 +1,4 @@
-from orcamento import Orcamento
+from orcamento import Orcamento, Item
 from impostos import ICMS, ISS
 
 
@@ -13,9 +13,8 @@ class Calculador_de_impostos(object):
 
 if __name__ == '__main__':
 
-    from orcamento import Orcamento
-
-    orcamento = Orcamento(500.0)
+    orcamento = Orcamento()
+    orcamento.adiciona_item(Item('ITEM - 1', 500))
     calculador_de_impostos = Calculador_de_impostos()
     calculador_de_impostos.realiza_calculo(orcamento, ICMS())  # imprime 50.0
     calculador_de_impostos.realiza_calculo(orcamento, ISS())  # imprime 30.0
