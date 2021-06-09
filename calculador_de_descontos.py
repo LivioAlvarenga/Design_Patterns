@@ -1,18 +1,19 @@
-from typing import Optional
 from orcamento import Orcamento, Item
+from descontos import (
+    Desconto_por_cinco_itens, Desconto_por_mais_de_quinhentos_reais
+)
 
 
 class Calculador_de_descontos(object):
 
-    def calcula(self, orçamento: Orcamento) -> Optional[float]:
+    def calcula(self, orçamento: Orcamento) -> float:
 
-        if orçamento.total_itens > 5:
-            return orçamento.valor * 0.1
-
-        elif orçamento.valor > 500:
-            return orçamento.valor * 0.07
-
-        return None
+        desconto = Desconto_por_cinco_itens().calcula(orçamento)
+        if desconto == 0:
+            desconto = (
+                Desconto_por_mais_de_quinhentos_reais().calcula(orçamento)
+            )
+        return desconto
 
 
 if __name__ == '__main__':
