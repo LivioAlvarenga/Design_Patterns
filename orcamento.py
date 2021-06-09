@@ -30,7 +30,7 @@ class Item(object):
 
 class Orcamento(object):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__itens: list = []
 
     @property
