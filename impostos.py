@@ -2,22 +2,44 @@ from orcamento import Orcamento
 from abc import ABCMeta, abstractmethod
 
 
-class Template_de_imposto_condicional(object):
+class Imposto(object):
 
     __metaclass__ = ABCMeta
 
-    def calcula(self, orçamento: Orcamento):
-        if self.deve_usar_maxima_taxacao(orçamento):
-            return self.maxima_taxacao(orçamento)
+    def __init__(self, outro_imposto=None):
+        self.__outro_imposto = outro_imposto
+
+    def calculo_do_outro_imposto(self, orçamento) -> float:
+        if self.__outro_imposto is None:
+            return 0
         else:
-            return self.minima_taxacao(orçamento)
+            return self.__outro_imposto.calcula(orçamento)
 
     @abstractmethod
-    def deve_usar_maxima_taxacao(self, orcamento: Orcamento) -> bool:
+    def calcula(self, orçamento: Orcamento) -> float:
+        pass
+
+
+class Template_de_imposto_condicional(Imposto):
+
+    __metaclass__ = ABCMeta
+
+    def calcula(self, orçamento: Orcamento) -> float:
+        if self.deve_usar_maxima_taxacao(orçamento):
+            return self.maxima_taxacao(orçamento) + (
+                self.calculo_do_outro_imposto(orçamento)
+            )
+        else:
+            return self.minima_taxacao(orçamento) + (
+                self.calculo_do_outro_imposto(orçamento)
+            )
+
+    @abstractmethod
+    def deve_usar_maxima_taxacao(self, orçamento: Orcamento) -> bool:
         pass
 
     @abstractmethod
-    def maxima_taxacao(self, orcamento: Orcamento) -> float:
+    def maxima_taxacao(self, orçamento: Orcamento) -> float:
         pass
 
     @abstractmethod
@@ -25,18 +47,20 @@ class Template_de_imposto_condicional(object):
         pass
 
 
-class ISS(object):
+class ISS(Imposto):
 
     def calcula(self, orçamento: Orcamento) -> float:
+        return orçamento.valor * 0.1 + (
+            self.calculo_do_outro_imposto(orçamento)
+        )
 
-        return orçamento.valor * 0.1
 
-
-class ICMS(object):
+class ICMS(Imposto):
 
     def calcula(self, orçamento: Orcamento) -> float:
-
-        return orçamento.valor * 0.06
+        return orçamento.valor * 0.06 + (
+            self.calculo_do_outro_imposto(orçamento)
+        )
 
 
 class ICPP(Template_de_imposto_condicional):
