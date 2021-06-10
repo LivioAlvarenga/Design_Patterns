@@ -1,4 +1,5 @@
 from typing import Union
+from abc import ABCMeta, abstractmethod
 
 
 class Item(object):
@@ -30,29 +31,25 @@ class Item(object):
 
 class Orcamento(object):
 
-    EM_APROVAÇÃO: int = 1
-    APROVADO: int = 2
-    REPROVADO: int = 3
-    FINALIZADO: int = 4
-
     def __init__(self) -> None:
         self.__itens: list = []
         self.__desconto_extra: float = 0
-        self.estado_atual = Orcamento.EM_APROVAÇÃO
+        self.estado_atual = Em_aprovacao()
+
+    def aprova(self):
+        self.estado_atual.aprova(self)
+
+    def reprova(self):
+        self.estado_atual.reprova(self)
+
+    def finaliza(self):
+        self.estado_atual.finaliza(self)
 
     def aplica_desconto_extra(self) -> None:
-        if self.estado_atual == Orcamento.EM_APROVAÇÃO:
-            self.__desconto_extra += self.valor * 0.02
-        elif self.estado_atual == Orcamento.APROVADO:
-            self.__desconto_extra += self.valor * 0.05
-        elif self.estado_atual == Orcamento.REPROVADO:
-            raise Exception(
-                'Orçamentos reprovados não recebem desconto extra'
-            )
-        elif self.estado_atual == Orcamento.FINALIZADO:
-            raise Exception(
-                'Orçamentos finalizados não recebem desconto extra'
-            )
+        self.estado_atual.aplica_desconto_extra(self)
+
+    def adiciona_desconto_extra(self, desconto):
+        self.__desconto_extra += desconto
 
     @property
     def valor(self) -> float:
@@ -93,6 +90,119 @@ class Orcamento(object):
         self.__itens.append(item)
 
 
+class Estado_de_um_orcamento(object):
+    """Classe abstrata com padrão Template Method. A classe filha que herdar será
+    obrigada a implementar o método: aplica_desconto_extra(), aprova(),
+    reprova() e finaliza().
+
+    Returns:
+        [Template Method]: Padrão Template Method nas classes filhas.
+    """
+
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def aplica_desconto_extra(self, orçamento: Orcamento) -> float:
+        """Método abstrato. Obrigatoriedade de implementação na classe filha.
+
+        Args:
+            orçameto (Class Orçamento): valor do orçamento.
+        """
+        pass
+
+    @abstractmethod
+    def aprova(self, orçamento: Orcamento):
+        """Método abstrato. Obrigatoriedade de implementação na classe filha.
+
+        Args:
+            orçameto (Class Orçamento): valor do orçamento.
+        """
+        pass
+
+    @abstractmethod
+    def reprova(self, orçamento: Orcamento):
+        """Método abstrato. Obrigatoriedade de implementação na classe filha.
+
+        Args:
+            orçameto (Class Orçamento): valor do orçamento.
+        """
+        pass
+
+    @abstractmethod
+    def finaliza(self, orçamento: Orcamento):
+        """Método abstrato. Obrigatoriedade de implementação na classe filha.
+
+        Args:
+            orçameto (Class Orçamento): valor do orçamento.
+        """
+        pass
+
+
+class Em_aprovacao(Estado_de_um_orcamento):
+
+    def aplica_desconto_extra(self, orçamento: Orcamento):
+        orçamento.adiciona_desconto_extra(orçamento.valor * 0.02)
+
+    def aprova(self, orçamento):
+        orçamento.estado_atual = Aprovado()
+
+    def reprova(self, orçamento):
+        orçamento.estado_atual = Reprovado()
+
+    def finaliza(self, orçamento):
+        raise Exception(
+            'Orçamento em aprovação não podem ir para finalizado diretamente.')
+
+
+class Aprovado(Estado_de_um_orcamento):
+
+    def aplica_desconto_extra(self, orçamento: Orcamento):
+        orçamento.adiciona_desconto_extra(orçamento.valor * 0.05)
+
+    def aprova(self, orçamento):
+        raise Exception('Orçamento já esta aprovado.')
+
+    def reprova(self, orçamento):
+        raise Exception('Orçamento aprovado não pode ser reprovado.')
+
+    def finaliza(self, orçamento):
+        orçamento.estado_atual = Finalizado()
+
+
+class Reprovado(Estado_de_um_orcamento):
+
+    def aplica_desconto_extra(self, orçamento: Orcamento) -> float:
+        raise Exception('Orçamentos reprovados não recebem desconto extra.')
+
+    def aprova(self, orçamento):
+        raise Exception('Orçamento reprovado não pode ser aprovado.')
+
+    def reprova(self, orçamento):
+        raise Exception(
+            'Orçamento reprovado não pode ser reprovado novamente.')
+
+    def finaliza(self, orçamento):
+        orçamento.estado_atual = Finalizado()
+
+
+class Finalizado(Estado_de_um_orcamento):
+
+    def aplica_desconto_extra(self, orçamento: Orcamento) -> float:
+        raise Exception('Orçamentos finalizados não recebem desconto extra.')
+
+    def aprova(self, orçamento):
+        raise Exception(
+            'Orçamento finalizado não pode ser aprovado novamente.')
+
+    def reprova(self, orçamento):
+        raise Exception(
+            'Orçamento finalizado não pode ser reprovado novamente.')
+
+    def finaliza(self, orçamento):
+        raise Exception(
+            'Orçamento finalizado não pode ser finalizado novamente.')
+
+
 # .Testando o código.
 if __name__ == '__main__':
 
@@ -103,7 +213,9 @@ if __name__ == '__main__':
 
     print(f'\nValor total do orçamento sem desconto é {orcamento.valor}')
 
-    orcamento.estado_atual = Orcamento.APROVADO
-    orcamento.aplica_desconto_extra()
+    orcamento.aprova()
+    orcamento.reprova()
+
+    # orcamento.aplica_desconto_extra()
 
     print(f'\nValor total do orçamento com desconto de é {orcamento.valor}')
