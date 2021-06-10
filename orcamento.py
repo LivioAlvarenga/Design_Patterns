@@ -30,8 +30,29 @@ class Item(object):
 
 class Orcamento(object):
 
+    EM_APROVAÇÃO: int = 1
+    APROVADO: int = 2
+    REPROVADO: int = 3
+    FINALIZADO: int = 4
+
     def __init__(self) -> None:
         self.__itens: list = []
+        self.estado_atual = Orcamento.EM_APROVAÇÃO
+        self.__desconto_extra: float = 0
+
+    def aplica_desconto_extra(self) -> None:
+        if self.estado_atual == Orcamento.EM_APROVAÇÃO:
+            self.__desconto_extra += self.valor * 0.02
+        elif self.estado_atual == Orcamento.APROVADO:
+            self.__desconto_extra += self.valor * 0.05
+        elif self.estado_atual == Orcamento.REPROVADO:
+            raise Exception(
+                'Orçamentos reprovados não recebem desconto extra'
+            )
+        elif self.estado_atual == Orcamento.FINALIZADO:
+            raise Exception(
+                'Orçamentos finalizados não recebem desconto extra'
+            )
 
     @property
     def valor(self) -> float:
@@ -44,7 +65,7 @@ class Orcamento(object):
         total: float = 0.0
         for item in self.__itens:
             total += item.valor
-        return total
+        return total - self.__desconto_extra
 
     @property
     def total_itens(self) -> int:
@@ -70,3 +91,18 @@ class Orcamento(object):
             item ([type]): [description]
         """
         self.__itens.append(item)
+
+
+if __name__ == '__main__':
+
+    orcamento = Orcamento()
+    orcamento.adiciona_item(Item('ITEM - 1', 100))
+    orcamento.adiciona_item(Item('ITEM - 2', 50))
+    orcamento.adiciona_item(Item('ITEM - 3', 400))
+
+    print(f'\nValor total do orçamento sem desconto é {orcamento.valor}')
+
+    orcamento.estado_atual = Orcamento.APROVADO
+    orcamento.aplica_desconto_extra()
+
+    print(f'\nValor total do orçamento com desconto de é {orcamento.valor}')
