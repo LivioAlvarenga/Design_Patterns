@@ -18,8 +18,8 @@ if __name__ == '__main__':
     calculador_de_impostos = Calculador_de_impostos()
 
     print('\nISS e ICMS')
-    calculador_de_impostos.realiza_calculo(orcamento, ICMS())
     calculador_de_impostos.realiza_calculo(orcamento, ISS())
+    calculador_de_impostos.realiza_calculo(orcamento, ICMS())
 
     # > Calcular impostos juntos
     print('\nISS com ICMS')

@@ -47,8 +47,15 @@ class Template_de_imposto_condicional(Imposto):
         pass
 
 
+def IPVX(método_ou_função):
+    def empacotamento(self, orçamento: Orcamento):
+        return método_ou_função(self, orçamento) + 50.0
+    return empacotamento
+
+
 class ISS(Imposto):
 
+    @IPVX
     def calcula(self, orçamento: Orcamento) -> float:
         return orçamento.valor * 0.1 + (
             self.calculo_do_outro_imposto(orçamento)
