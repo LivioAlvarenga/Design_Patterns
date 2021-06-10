@@ -37,8 +37,8 @@ class Orcamento(object):
 
     def __init__(self) -> None:
         self.__itens: list = []
-        self.estado_atual = Orcamento.EM_APROVAÇÃO
         self.__desconto_extra: float = 0
+        self.estado_atual = Orcamento.EM_APROVAÇÃO
 
     def aplica_desconto_extra(self) -> None:
         if self.estado_atual == Orcamento.EM_APROVAÇÃO:
@@ -57,10 +57,10 @@ class Orcamento(object):
     @property
     def valor(self) -> float:
         """Quando a propriedade for acessada, ela soma cada item retornando o valor
-            do orçamento
+        do orçamento e aplica o desconto extra.
 
         Returns:
-            float: Valor total do orçamento
+            float: Valor total do orçamento menos desconto extra.
         """
         total: float = 0.0
         for item in self.__itens:
@@ -69,7 +69,7 @@ class Orcamento(object):
 
     @property
     def total_itens(self) -> int:
-        """Conta total de itens do orçamento
+        """Conta total de itens do orçamento.
 
         Returns:
             int: Quantidade total de itens do orçamento
@@ -85,14 +85,15 @@ class Orcamento(object):
         return tuple(self.__itens)
 
     def adiciona_item(self, item: Item):
-        """Adiciona itens a lista itens
+        """Adiciona itens a lista itens.
 
         Args:
-            item ([type]): [description]
+            item (class Item): Recebe descrição do item e valor do mesmo
         """
         self.__itens.append(item)
 
 
+# .Testando o código.
 if __name__ == '__main__':
 
     orcamento = Orcamento()
