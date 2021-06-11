@@ -24,7 +24,8 @@ class Nota_fiscal(object):
                  cnpj: str,
                  itens: Any,
                  data_de_emissão: date = date.today(),
-                 detalhes: str = ''
+                 detalhes: str = '',
+                 observadores: list = []
                  ):
 
         self.__razão_social = razão_social
@@ -35,6 +36,10 @@ class Nota_fiscal(object):
                 'Detalhes da nota não pode ter mais do que 20 caracteres')
         self.__detalhes = detalhes
         self.__itens = itens
+
+        # . Aplicando padrão observadores,
+        for observador in observadores:
+            observador(self)
 
     @property
     def razão_social(self):
@@ -56,6 +61,8 @@ class Nota_fiscal(object):
 # .Testando o código.
 if __name__ == '__main__':
 
+    from observadores import imprime_nf, envia_nf_por_email, salva_nf_no_banco
+
     itens = [Item('ITEM A', 100), Item('ITEM B', 200)]
 
     nota_fiscal = Nota_fiscal(
@@ -63,10 +70,11 @@ if __name__ == '__main__':
         razão_social='FUSA Limitada',
         cnpj='012345678901234',
         itens=itens,
-        data_de_emissão=date.today()
+        data_de_emissão=date.today(),
+        observadores=[imprime_nf, envia_nf_por_email, salva_nf_no_banco]
     )
 
-    print(f'NF sem método Builder\n\
+    print(f'\nNF sem método Builder\n\
         Razão social: {nota_fiscal.razão_social}\n\
         CNPF: {nota_fiscal.cnpj}\n\
         Data de emissão: {nota_fiscal.data_de_emissão}\n\
