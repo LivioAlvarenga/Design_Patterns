@@ -1,19 +1,21 @@
 from datetime import date
-from typing import Any
+from typing import List, Union
 
 
 class Item(object):
 
-    def __init__(self, descrição: str, valor: float):
+    def __init__(self, descrição: str, valor: Union[int, float]):
         self.__descrição = descrição
         self.__valor = valor
 
     @property
-    def descrição(self):
+    def descrição(self) -> str:
+        """Descrição do item da NF"""
         return self.__descrição
 
     @property
-    def valor(self):
+    def valor(self) -> Union[int, float]:
+        """Valor do item da NF"""
         return self.__valor
 
 
@@ -22,7 +24,7 @@ class Nota_fiscal(object):
     def __init__(self,
                  razão_social: str,
                  cnpj: str,
-                 itens: Any,
+                 itens: List[Item],
                  data_de_emissão: date = date.today(),
                  detalhes: str = '',
                  observadores: list = []
@@ -43,18 +45,22 @@ class Nota_fiscal(object):
 
     @property
     def razão_social(self):
+        """Razão social da NF"""
         return self.__razão_social
 
     @property
     def cnpj(self):
+        """CNPJ da NF"""
         return self.__cnpj
 
     @property
     def data_de_emissão(self):
+        """Data de emissão da NF. Se omitido data de hoje"""
         return self.__data_de_emissão
 
     @property
     def detalhes(self):
+        """Detalhes da NF, deve ser menor que 20 caracteres."""
         return self.__detalhes
 
 
