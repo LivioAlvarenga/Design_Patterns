@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 
 
 class Contrato(object):
@@ -51,6 +52,28 @@ class Contrato(object):
         elif self.__tipo == 'ACERTADO':
             self.__tipo = 'CONCLUIDO'
 
+    def salva_estado(self):
+        """Cria um estado com espelho do contrato atual Obs. Um novo objeto,
+        pois o mesmo será salvo no historico.
+
+        Returns:
+            Class Estado: Um objeto class Estado (class Contrato)
+        """
+        return Estado(Contrato(data=self.__data,
+                               cliente=self.__cliente,
+                               tipo=self.__tipo))
+
+    def restaura_estado(self, estado: Any):
+        """Restaura um contrato com os dados do estado (class Estado()).
+
+        Args:
+            estado (class Estado): class Estado contendo historico de um
+            objeto Contrato()
+        """
+        self.__cliente = estado.contrato.cliente
+        self.__data = estado.contrato.data
+        self.__tipo = estado.contrato.tipo
+
 
 class Estado(object):
 
@@ -62,7 +85,7 @@ class Estado(object):
         """Da acesso ao contrato da class Contrato
 
         Returns:
-            class Contrato: Objeto class Contato
+            class Contrato: Objeto class Contrato
         """
         return self.__contrato
 
@@ -72,11 +95,20 @@ class Historico(object):
     def __init__(self):
         self.__estados_salvos: list = []
 
+    @property
+    def estados_salvos(self):
+        """Da acesso a lista de contratos salvos.
+
+        Returns:
+            Lista de contrato [list]: Objeto class Contrato
+        """
+        return self.__estados_salvos
+
     def obtém_estado(self, indice: int):
         """Consulta o historico dos contratatos em uma list atreves de um indice.
 
         Returns:
-            class Contrato: Objeto class Contato especifico.
+            class Contrato: Objeto class Contrato especifico.
         """
         return self.__estados_salvos[indice]
 
@@ -93,6 +125,8 @@ if __name__ == '__main__':
     contrato = Contrato(data=date.today(),
                         cliente='Flávio Almeida')
 
+    print('\n1º Contrato')
+
     print(f'\nContrato: \n\
         Cliente: {contrato.cliente}\n\
         Data: {contrato.data}\n\
@@ -100,7 +134,48 @@ if __name__ == '__main__':
 
     contrato.avança()
 
+    print('\nContrato apos avançar')
+
     print(f'\nContrato: \n\
         Cliente: {contrato.cliente}\n\
         Data: {contrato.data}\n\
         Tipo: {contrato.tipo}')
+
+    # .Adicionando historicos
+    historico.adiciona_estado(contrato.salva_estado())
+
+    contrato.avança()
+
+    historico.adiciona_estado(contrato.salva_estado())
+
+    contrato.avança()
+
+    # .Contrato mudou cliente
+    contrato.cliente = 'Livio Alvarenga'
+
+    historico.adiciona_estado(contrato.salva_estado())
+
+    # .Restaurando contratos
+    print('\nContratos restaurados.')
+
+    for indice in range(len(historico.estados_salvos)):
+
+        contrato.restaura_estado(historico.obtém_estado(indice))
+
+        print(f'\nContrato: \n\
+            Cliente: {contrato.cliente}\n\
+            Data: {contrato.data}\n\
+            Tipo: {contrato.tipo}')
+
+# ! Padrão de projeto Memento
+'''Agora temos uma maneira eficiente de salvar estados de um objeto, e
+restaurá-los caso necessário. Sempre que temos um problema como esse, fazemos
+uso do Memento. O Memento é um padrão de projeto que nos ajuda a salvar e
+restaurar estados de objetos.
+
+Um possível problema é a quantidade de memória que ele pode ocupar, afinal
+estamos guardando muitas instâncias de objetos que podem ser pesados. Por isso,
+dependendo do tamanho dos seus objetos, a classe Estado pode passar a guardar
+não o objeto todo, mas sim somente as propriedades que mais fazem sentido.
+Nada impede você também de limitar a quantidade máxima de objetos no histórico
+que será armazenado.'''
