@@ -46,5 +46,5 @@ o nome de Interpreter. O padrão é bastante útil quando temos que implementar
 interpretadores para DSLs, ou coisas similares. É um padrão bem complicado, mas
 bastante interessante. É comum que, ao ler a string (como por exemplo 2+3/4),
 o programa transforme-o em uma melhor estrutura de dados (como as nossas
-classes Expressao) e aí interprete essa árvore. É realmente um padrão de
+classes Expressão) e aí interprete essa árvore. É realmente um padrão de
 projeto bem peculiar, e com utilização bem específica.'''
